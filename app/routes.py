@@ -4,6 +4,7 @@ import pandas as pd
 from urllib.request import urlopen
 import requests
 import json
+from aifsim import Aifsim
 
 @application.route('/')
 @application.route('/index')
@@ -21,5 +22,8 @@ def form_post():
 def render_text():
     fid = session.get('fid', None)
     lid = session.get('lid', None)
-    return render_template('results.html', title=text, table=[items])
+    aifs = Aifsim()
+    print(aifs.get_graph_sim(fid,lid))
+    return render_template('')
+    #return render_template('results.html', title=text, table=[items])
 
