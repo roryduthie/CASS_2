@@ -8,7 +8,7 @@ RUN apt-get install -y git
 
 ADD requirements.txt .
 RUN pip install -r requirements.txt
-RUN git clone https://github.com/roryduthie/GMatch4py
+RUN git clone https://github.com/Jacobe2169/GMatch4py
 WORKDIR /GMatch4py
 RUN pip install .
 WORKDIR /home/cass
