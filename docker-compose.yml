@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+ cass:
+  container_name: cass
+  build: .
+  ports:
+  - "8200:8200"
