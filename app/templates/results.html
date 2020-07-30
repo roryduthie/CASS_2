@@ -9,11 +9,50 @@
 
 <body>
     <header>
-        <img src="{{url_for('static', filename='img/argnav.png')}}" />
-        <h1> SIM</h1>
+        <img src="{{url_for('static', filename='img/cass-ed.png')}}" />
 
     </header>
 
+<br/>
+<br/>
+<br/>
+
+    <div class="container">
+        <div class="column column-one">
+            <h2>Overall Similarity</h2>
+        </div>
+        <div class="column column-two">
+            <h2>Text Similarity</h2>
+        </div>
+        <div class="column column-three">
+            <h2>Graph Similarity</h2>
+        </div>
+    </div>
+    <div class="container">
+        <div class="column column-one-dig">
+            <h2>{{ overall }}</h2>
+        </div>
+        <div class="column column-two-dig">
+            <h2>{{ text_sim }}</h2>
+        </div>
+        <div class="column column-three-dig">
+            <h2>{{ graph_sim }}</h2>
+        </div>
+    </div>
+    <br/>
+<br/>
+<br/>
+    <div class="container">
+        <div class="column column-one-text">
+            <p>The overall similarity, simply, provides an average of the text and graph similairy measures.</p>
+        </div>
+        <div class="column column-two-text">
+            <p>The text similarity measure provides the overall mean for text nodes in an AIF graph (l-nodes and i-nodes if both are present). Connections are selected through a matrix approach meaning all nodes have a corresponding connected node. Fuzzy string matching is then used to provide a normalised text score for the full matrix. Matches are then selected by similarity score until no nodes are left to be matched.</p>
+        </div>
+        <div class="column column-three-text">
+            <p>The graph similarity measure provides the overall mean for all component parts in an AIF diagram (e.g. i-nodes, i-nodes and s-nodes combined, i-nodes, l-nodes, and s-nodes etc.). Graphs are created from through NetworkX and the Graph Edit Distance calucalted for set, creating a distance matrix. The minimum value from the distance matrix is then selected (except 0). The mean is then taken for all calculations to give a similarity score. </p>
+        </div>
+    </div>
 </body>
 
 </html>

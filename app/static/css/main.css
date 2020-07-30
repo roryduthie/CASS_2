@@ -1,0 +1,102 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+    display: flex;
+    width:60%;
+    margin-left: 20%;
+}
+
+.column {
+    flex: 1;
+
+
+}
+header img{
+    float: center;
+    background:transparent;
+    padding: 30px;
+    background-color: #ffb347;
+}
+
+
+header h1{
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    float:right;
+  position: relative;
+  font-size: 1.4em;
+    color: white;
+    background-color: #ffb347;
+    padding-top: 15px;
+    padding-right: 40px;
+}
+header{
+    background-color: #ffb347;
+    width:100%;
+}
+
+
+.column-one {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 1;
+    text-align: center;
+    background: #f2f2f2;
+    border: 1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+.column-two {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 2;
+    text-align: center;
+    background: #f2f2f2;
+    border: 1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+.column-three {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 3;
+    text-align: center;
+    background: #f2f2f2;
+    border: 1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+
+.column-one-dig {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 1;
+    text-align: center;
+    border: 1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+.column-two-dig {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 2;
+    text-align: center;
+    border: 1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+.column-three-dig {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 3;
+    text-align: center;
+    border: 1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+
+.column-one-text {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 1;
+    text-align: left;
+}
+.column-two-text {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 2;
+    text-align: left;
+}
+.column-three-text {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Helvetica, Arial, sans-serif;
+    order: 3;
+    text-align: left;
+}

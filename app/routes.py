@@ -31,7 +31,10 @@ def render_text():
     fid = session.get('fid', None)
     lid = session.get('lid', None)
     aifs = Aifsim()
-    print(aifs.get_graph_sim(fid,lid))
-    return render_template('results.html')
-    #return render_template('results.html', title=text, table=[items])
+    res = aifs.get_graph_sim(fid,lid)
+    overall_sim = res[0]
+    text_sim = res[1]
+    graph_sim = res[2]
+    return render_template('results.html', overall=overall_sim, text_sim=text_sim, graph_sim=graph_sim)
+    #return render_template('results.html', overall, table=[items])
 
