@@ -1,4 +1,4 @@
-from application.centrality import Centrality
+from app.centrality import Centrality
 import numpy as np
 from numpy import unravel_index
 import copy
