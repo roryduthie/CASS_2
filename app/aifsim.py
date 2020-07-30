@@ -1,10 +1,9 @@
-from centrality import Centrality
+from app.centrality import Centrality
 import numpy as np
 from numpy import unravel_index
 import copy
 import gmatch4py as gm
 import networkx as nx
-from similarity.normalized_levenshtein import NormalizedLevenshtein
 from fuzzywuzzy import fuzz
 
 class Aifsim:
@@ -356,23 +355,22 @@ class Aifsim:
     @staticmethod
     def text_sim_matrix(g_list, g1_list):
         aifsim = Aifsim()
-        normalized_levenshtein = NormalizedLevenshtein()
         g_size = len(g_list)
         g1_size = len(g1_list)
 
 
         if g_size >= g1_size:
-            mat = aifsim.loop_nodes(g_list, g1_list, normalized_levenshtein)
+            mat = aifsim.loop_nodes(g_list, g1_list)
             rels, vals = aifsim.select_max_vals(mat, g1_size, g_list, g1_list)
         else:
-            mat = aifsim.loop_nodes(g1_list, g_list, normalized_levenshtein)
+            mat = aifsim.loop_nodes(g1_list, g_list)
             rels, vals = aifsim.select_max_vals(mat, g_size, g1_list, g_list)
 
         return rels, vals
 
 
     @staticmethod
-    def loop_nodes(g_list, g1_list, normalized_levenshtein):
+    def loop_nodes(g_list, g1_list):
         matrix = np.zeros((len(g_list), len(g1_list)))
         for i, node in enumerate(g_list):
             text = node[1]
