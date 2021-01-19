@@ -16,6 +16,7 @@ def form_post():
     lid = request.form['ldata']
     session['fid'] = fid
     session['lid'] = lid
+
     return redirect('/results')
 
 @application.route('/index', methods=['POST'])
