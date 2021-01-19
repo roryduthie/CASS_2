@@ -14,6 +14,7 @@ def index():
 def form_post():
     fid = request.form['fdata']
     lid = request.form['ldata']
+
     session['fid'] = fid
     session['lid'] = lid
 
