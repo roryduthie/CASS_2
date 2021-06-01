@@ -583,7 +583,7 @@ class Aifsim:
     def ra_anchor(graph1, graph2):
 
         conf_matrix = [[0, 0],[0, 0]]
-
+        aifsim = Aifsim()
         cent = Centrality()
         ras1 = cent.get_ras(graph1)
         ras2 = cent.get_ras(graph2)
@@ -595,7 +595,7 @@ class Aifsim:
             if ra1_len > ra2_len:
                 for ra_i, ra in enumerate(ras1):
                         ras2_id = ''
-                        yas1 = get_ya_nodes_from_prop(ra, graph1)
+                        yas1 = aifsim.get_ya_nodes_from_prop(ra, graph1)
                         try:
                             ras2_id = ras2[ra_i]
                         except:
@@ -615,7 +615,7 @@ class Aifsim:
             elif ra2_len > ra1_len:
                 for ra_i, ra in enumerate(ras2):
                         ras1_id = ''
-                        yas2 = get_ya_nodes_from_prop(ra, graph2)
+                        yas2 = aifsim.get_ya_nodes_from_prop(ra, graph2)
                         try:
                             ras1_id = ras1[ra_i]
                         except:
@@ -625,7 +625,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[0][1] =  conf_matrix[0][1] + 1
                         else:
-                            yas1 = get_ya_nodes(ras1_id, graph1)
+                            yas1 = aifsim.get_ya_nodes(ras1_id, graph1)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -634,8 +634,8 @@ class Aifsim:
 
             else:
                 for ra_i, ra in enumerate(ras1):
-                    ya1 = get_ya_nodes_from_prop(ra, graph1)
-                    ya2 = get_ya_nodes_from_prop(ras2[ra_i], graph2)
+                    ya1 = aifsim.get_ya_nodes_from_prop(ra, graph1)
+                    ya2 = aifsim.get_ya_nodes_from_prop(ras2[ra_i], graph2)
 
                     if ya1 == ya2:
                         conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -656,7 +656,7 @@ class Aifsim:
     def ma_anchor(graph1, graph2):
 
         conf_matrix = [[0, 0],[0, 0]]
-
+        aifsim = Aifsim()
         cent = Centrality()
         cas1 = cent.get_mas(graph1)
         cas2 = cent.get_mas(graph2)
@@ -668,7 +668,7 @@ class Aifsim:
             if ca1_len > ca2_len:
                 for ca_i, ca in enumerate(cas1):
                         cas2_id = ''
-                        yas1 = get_ya_nodes_from_prop(ca, graph1)
+                        yas1 = aifsim.get_ya_nodes_from_prop(ca, graph1)
                         try:
                             cas2_id = cas2[ca_i]
                         except:
@@ -678,7 +678,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[1][0] =  conf_matrix[1][0] + 1
                         else:
-                            yas2 = get_ya_nodes(cas2_id, graph2)
+                            yas2 = aifsim.get_ya_nodes(cas2_id, graph2)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -688,7 +688,7 @@ class Aifsim:
             elif ca2_len > ca1_len:
                 for ca_i, ca in enumerate(cas2):
                         cas1_id = ''
-                        yas2 = get_ya_nodes_from_prop(ca, graph2)
+                        yas2 = aifsim.get_ya_nodes_from_prop(ca, graph2)
                         try:
                             cas1_id = cas1[ca_i]
                         except:
@@ -698,7 +698,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[0][1] =  conf_matrix[0][1] + 1
                         else:
-                            yas1 = get_ya_nodes(cas1_id, graph1)
+                            yas1 = aifsim.get_ya_nodes(cas1_id, graph1)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -707,8 +707,8 @@ class Aifsim:
 
             else:
                 for ca_i, ca in enumerate(cas1):
-                    ya1 = get_ya_nodes_from_prop(ca, graph1)
-                    ya2 = get_ya_nodes_from_prop(cas2[ca_i], graph2)
+                    ya1 = aifsim.get_ya_nodes_from_prop(ca, graph1)
+                    ya2 = aifsim.get_ya_nodes_from_prop(cas2[ca_i], graph2)
 
                     if ya1 == ya2:
                         conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -729,7 +729,7 @@ class Aifsim:
     def ca_anchor(graph1, graph2):
 
         conf_matrix = [[0, 0],[0, 0]]
-
+        aifsim = Aifsim()
         cent = Centrality()
         cas1 = cent.get_cas(graph1)
         cas2 = cent.get_cas(graph2)
@@ -741,7 +741,7 @@ class Aifsim:
             if ca1_len > ca2_len:
                 for ca_i, ca in enumerate(cas1):
                         cas2_id = ''
-                        yas1 = get_ya_nodes_from_prop(ca, graph1)
+                        yas1 = aifsim.get_ya_nodes_from_prop(ca, graph1)
                         try:
                             cas2_id = cas2[ca_i]
                         except:
@@ -751,7 +751,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[1][0] =  conf_matrix[1][0] + 1
                         else:
-                            yas2 = get_ya_nodes(cas2_id, graph2)
+                            yas2 = aifsim.get_ya_nodes(cas2_id, graph2)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -761,7 +761,7 @@ class Aifsim:
             elif ca2_len > ca1_len:
                 for ca_i, ca in enumerate(cas2):
                         cas1_id = ''
-                        yas2 = get_ya_nodes_from_prop(ca, graph2)
+                        yas2 = aifsim.get_ya_nodes_from_prop(ca, graph2)
                         try:
                             cas1_id = cas1[ca_i]
                         except:
@@ -771,7 +771,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[0][1] =  conf_matrix[0][1] + 1
                         else:
-                            yas1 = get_ya_nodes(cas1_id, graph1)
+                            yas1 = aifsim.get_ya_nodes(cas1_id, graph1)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -780,8 +780,8 @@ class Aifsim:
 
             else:
                 for ca_i, ca in enumerate(cas1):
-                    ya1 = get_ya_nodes_from_prop(ca, graph1)
-                    ya2 = get_ya_nodes_from_prop(cas2[ca_i], graph2)
+                    ya1 = aifsim.get_ya_nodes_from_prop(ca, graph1)
+                    ya2 = aifsim.get_ya_nodes_from_prop(cas2[ca_i], graph2)
 
                     if ya1 == ya2:
                         conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -797,5 +797,36 @@ class Aifsim:
             conf_matrix[1][0] =  conf_matrix[1][0] + ca1_len
 
         return conf_matrix
+
+    @staticmethod
+    def combine_s_node_matrix(ra, ca, ma):
+        #Combines the ra_anchor, ca_anchor and ma_anchor, matrices
+        result = [[ra[i][j] + ca[i][j]  for j in range(len(ra[0]))] for i in range(len(ra))]
+
+        all_result = [[ma[i][j] + result[i][j]  for j in range(len(result[0]))] for i in range(len(result))]
+
+        return all_result
+
+    @staticmethod
+    def get_ya_nodes(node_id, graph):
+
+        ya_nodes = list(graph.successors(node_id))
+        for ya in ya_nodes:
+            n_type = graph.nodes[ya]['type']
+            if n_type == 'YA':
+                n_text = graph.nodes[ya]['text']
+                return n_text
+        return ''
+
+    @staticmethod
+    def get_ya_nodes_from_prop(node_id, graph):
+
+        ya_nodes = list(graph.predecessors(node_id))
+        for ya in ya_nodes:
+            n_type = graph.nodes[ya]['type']
+            if n_type == 'YA':
+                n_text = graph.nodes[ya]['text']
+                return n_text
+        return ''
 
 
