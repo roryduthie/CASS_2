@@ -232,6 +232,16 @@ class Centrality:
         return ra_nodes
 
     @staticmethod
+    def get_cas(graph):
+        ca_nodes =  [x for x,y in graph.nodes(data=True) if y['type']=='CA']
+        return ca_nodes
+
+    @staticmethod
+    def get_mas(graph):
+        ma_nodes =  [x for x,y in graph.nodes(data=True) if y['type']=='MA']
+        return ma_nodes
+
+    @staticmethod
     def get_ra_i_nodes(graph, ras):
         ra_tups = []
         for ra in ras:

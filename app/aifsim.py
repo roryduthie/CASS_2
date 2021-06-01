@@ -577,3 +577,225 @@ class Aifsim:
         return overall_score, text_mean, graph_mean
 
 
+    #Get TA Anchor RA, CA, MA - Requires CA_anchor ma_anchor and ra_anchor then combination of confusion matrices
+
+    @staticmethod
+    def ra_anchor(graph1, graph2):
+
+        conf_matrix = [[0, 0],[0, 0]]
+
+        cent = Centrality()
+        ras1 = cent.get_ras(graph1)
+        ras2 = cent.get_ras(graph2)
+
+        ra1_len = len(ras1)
+        ra2_len = len(ras2)
+
+        if ra1_len > 0 and ra2_len > 0:
+            if ra1_len > ra2_len:
+                for ra_i, ra in enumerate(ras1):
+                        ras2_id = ''
+                        yas1 = get_ya_nodes_from_prop(ra, graph1)
+                        try:
+                            ras2_id = ras2[ra_i]
+                        except:
+                            ras2_id = ''
+
+                        if ras2_id == '':
+                            #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
+                            conf_matrix[1][0] =  conf_matrix[1][0] + 1
+                        else:
+                            yas2 = get_ya_nodes(ras2_id, graph2)
+                            if yas1 == yas2:
+
+                                conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                            else:
+                                conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+            elif ra2_len > ra1_len:
+                for ra_i, ra in enumerate(ras2):
+                        ras1_id = ''
+                        yas2 = get_ya_nodes_from_prop(ra, graph2)
+                        try:
+                            ras1_id = ras1[ra_i]
+                        except:
+                            ras1_id = ''
+
+                        if ras1_id == '':
+                            #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
+                            conf_matrix[0][1] =  conf_matrix[0][1] + 1
+                        else:
+                            yas1 = get_ya_nodes(ras1_id, graph1)
+                            if yas1 == yas2:
+
+                                conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                            else:
+                                conf_matrix[0][1] =  conf_matrix[0][1] + 1
+
+            else:
+                for ra_i, ra in enumerate(ras1):
+                    ya1 = get_ya_nodes_from_prop(ra, graph1)
+                    ya2 = get_ya_nodes_from_prop(ras2[ra_i], graph2)
+
+                    if ya1 == ya2:
+                        conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                    else:
+                        conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+        elif ra1_len == 0 and ra2_len == 0:
+            conf_matrix[1][1] =  conf_matrix[1][1] + 1
+
+        elif ra1_len == 0:
+            conf_matrix[0][1] =  conf_matrix[0][1] + ra2_len
+        elif ra2_len == 0:
+            conf_matrix[1][0] =  conf_matrix[1][0] + ra1_len
+
+        return conf_matrix
+
+    @staticmethod
+    def ma_anchor(graph1, graph2):
+
+        conf_matrix = [[0, 0],[0, 0]]
+
+        cent = Centrality()
+        cas1 = cent.get_mas(graph1)
+        cas2 = cent.get_mas(graph2)
+
+        ca1_len = len(cas1)
+        ca2_len = len(cas2)
+
+        if ca1_len > 0 and ca2_len > 0:
+            if ca1_len > ca2_len:
+                for ca_i, ca in enumerate(cas1):
+                        cas2_id = ''
+                        yas1 = get_ya_nodes_from_prop(ca, graph1)
+                        try:
+                            cas2_id = cas2[ca_i]
+                        except:
+                            cas2_id = ''
+
+                        if cas2_id == '':
+                            #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
+                            conf_matrix[1][0] =  conf_matrix[1][0] + 1
+                        else:
+                            yas2 = get_ya_nodes(cas2_id, graph2)
+                            if yas1 == yas2:
+
+                                conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                            else:
+                                conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+            elif ca2_len > ca1_len:
+                for ca_i, ca in enumerate(cas2):
+                        cas1_id = ''
+                        yas2 = get_ya_nodes_from_prop(ca, graph2)
+                        try:
+                            cas1_id = cas1[ca_i]
+                        except:
+                            cas1_id = ''
+
+                        if cas1_id == '':
+                            #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
+                            conf_matrix[0][1] =  conf_matrix[0][1] + 1
+                        else:
+                            yas1 = get_ya_nodes(cas1_id, graph1)
+                            if yas1 == yas2:
+
+                                conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                            else:
+                                conf_matrix[0][1] =  conf_matrix[0][1] + 1
+
+            else:
+                for ca_i, ca in enumerate(cas1):
+                    ya1 = get_ya_nodes_from_prop(ca, graph1)
+                    ya2 = get_ya_nodes_from_prop(cas2[ca_i], graph2)
+
+                    if ya1 == ya2:
+                        conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                    else:
+                        conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+        elif ca1_len == 0 and ca2_len == 0:
+            conf_matrix[1][1] =  conf_matrix[1][1] + 1
+
+        elif ca1_len == 0:
+            conf_matrix[0][1] =  conf_matrix[0][1] + ca2_len
+        elif ca2_len == 0:
+            conf_matrix[1][0] =  conf_matrix[1][0] + ca1_len
+
+        return conf_matrix
+
+    @staticmethod
+    def ca_anchor(graph1, graph2):
+
+        conf_matrix = [[0, 0],[0, 0]]
+
+        cent = Centrality()
+        cas1 = cent.get_cas(graph1)
+        cas2 = cent.get_cas(graph2)
+
+        ca1_len = len(cas1)
+        ca2_len = len(cas2)
+
+        if ca1_len > 0 and ca2_len > 0:
+            if ca1_len > ca2_len:
+                for ca_i, ca in enumerate(cas1):
+                        cas2_id = ''
+                        yas1 = get_ya_nodes_from_prop(ca, graph1)
+                        try:
+                            cas2_id = cas2[ca_i]
+                        except:
+                            cas2_id = ''
+
+                        if cas2_id == '':
+                            #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
+                            conf_matrix[1][0] =  conf_matrix[1][0] + 1
+                        else:
+                            yas2 = get_ya_nodes(cas2_id, graph2)
+                            if yas1 == yas2:
+
+                                conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                            else:
+                                conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+            elif ca2_len > ca1_len:
+                for ca_i, ca in enumerate(cas2):
+                        cas1_id = ''
+                        yas2 = get_ya_nodes_from_prop(ca, graph2)
+                        try:
+                            cas1_id = cas1[ca_i]
+                        except:
+                            cas1_id = ''
+
+                        if cas1_id == '':
+                            #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
+                            conf_matrix[0][1] =  conf_matrix[0][1] + 1
+                        else:
+                            yas1 = get_ya_nodes(cas1_id, graph1)
+                            if yas1 == yas2:
+
+                                conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                            else:
+                                conf_matrix[0][1] =  conf_matrix[0][1] + 1
+
+            else:
+                for ca_i, ca in enumerate(cas1):
+                    ya1 = get_ya_nodes_from_prop(ca, graph1)
+                    ya2 = get_ya_nodes_from_prop(cas2[ca_i], graph2)
+
+                    if ya1 == ya2:
+                        conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                    else:
+                        conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+        elif ca1_len == 0 and ca2_len == 0:
+            conf_matrix[1][1] =  conf_matrix[1][1] + 1
+
+        elif ca1_len == 0:
+            conf_matrix[0][1] =  conf_matrix[0][1] + ca2_len
+        elif ca2_len == 0:
+            conf_matrix[1][0] =  conf_matrix[1][0] + ca1_len
+
+        return conf_matrix
+
+
