@@ -515,6 +515,16 @@ class Aifsim:
             lev_vals.append(0)
         return lev_rels, lev_vals
 
+    @staticmethod
+    def convert_to_dict(conf_matrix):
+        values = []
+        dicts = {}
+        for i, col in enumerate(conf_matrix):
+            dicts[i] = {}
+            for j, row in enumerate(col):
+                dicts[i][j] = row
+        return dicts
+
 
     @staticmethod
     def get_mean_of_list(a):
