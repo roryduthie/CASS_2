@@ -5,6 +5,11 @@ import copy
 import gmatch4py as gm
 import networkx as nx
 from fuzzywuzzy import fuzz
+import re
+import segeval
+from bs4 import BeautifulSoup, SoupStrainer
+import bs4
+
 
 class Aifsim:
     @staticmethod
@@ -12,6 +17,50 @@ class Aifsim:
         dir_path = 'http://www.aifdb.org/json/' + str(aif_id)
         graph, json = cent.get_graph_url(dir_path)
         return graph, json
+
+    @staticmethod
+    def get_text(nodeset_id):
+        text_path = 'http://ova.arg.tech/helpers/dbtxt.php?nodeSetID=' + str(nodeset_id)
+        xml_page = requests.get(text_path)
+        xml_data = xml_page.text
+        return xml_data
+
+    @staticmethod
+    def get_similarity(text_1, text_2):
+    #text_1 and text_2 are xml data that uses spans to seperate boundaries
+    #e.g. BOSTON, MA ... <span class="highlighted" id="634541">Steven L.
+    #Davis pled guilty yesterday to federal charges that he stole and disclosed trade secrets of The Gillette Company</span>.
+
+        if text_1 == '' or text_2 == '':
+            return 'Error Text Input Is Empty'
+        else:
+
+            xml_soup_1 = BeautifulSoup(text_1)
+            xml_soup_2 = BeautifulSoup(text_2)
+            xml_soup_1 = remove_html_tags(xml_soup_1)
+            xml_soup_2 = remove_html_tags(xml_soup_2)
+
+            segements_1 = get_segements(xml_soup_1)
+            segements_2 = get_segements(xml_soup_2)
+
+            seg_check = check_segment_length(segements_1, segements_2)
+
+            if not seg_check:
+                return 'Error Source Text Was Different'
+
+            masses_1 = segeval.convert_positions_to_masses(segements_1)
+            masses_2 = segeval.convert_positions_to_masses(segements_2)
+
+            ss = segeval.segmentation_similarity(masses_1, masses_2)
+            ss = float(ss)
+            pk = segeval.pk(masses_1, masses_2)
+            pk = 1 - float(pk)
+            win_diff = segeval.window_diff(masses_1, masses_2)
+            win_diff = 1 - float(win_diff)
+
+            return ss, pk, win_diff
+
+
     @staticmethod
     def is_iat(g, g1, centra):
         l_nodes = centra.get_l_node_list(g)
