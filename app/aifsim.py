@@ -829,4 +829,513 @@ class Aifsim:
                 return n_text
         return ''
 
+    @staticmethod
+    def prop_rels_comp(prop_matrix, graph1, graph2):
+        aifsim = Aifsim()
+        conf_matrix = [[0, 0],[0, 0]]
+
+
+        for rel_dict in prop_matrix:
+            ID1 = rel_dict['ID1']
+            ID2 = rel_dict['ID2']
+            text1 = rel_dict['text1']
+            text2 = rel_dict['text2']
+
+            if ID1 != 0 and ID2 != 0:
+
+                ras1, cas1, mas1 = aifsim.count_s_nodes(ID1, graph1)
+                ras2, cas2, mas2 = aifsim.count_s_nodes(ID2, graph2)
+
+
+                if ras1 == ras2:
+                    conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                elif ras1 > ras2:
+                    conf_matrix[1][0] =  conf_matrix[1][0] + 1
+                elif ras2 > ras1:
+                    conf_matrix[0][1] =  conf_matrix[0][1] + 1
+
+                if cas1 == cas2:
+                    conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                elif cas1 > cas2:
+                    conf_matrix[1][0] =  conf_matrix[1][0] + 1
+                elif cas2 > cas1:
+                    conf_matrix[0][1] =  conf_matrix[0][1] + 1
+
+                if mas1 == mas2:
+                    conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                elif mas1 > mas2:
+                    conf_matrix[1][0] =  conf_matrix[1][0] + 1
+                elif mas2 > mas1:
+                    conf_matrix[0][1] =  conf_matrix[0][1] + 1
+            elif ID1 == 0 and ID2 == 0:
+                conf_matrix[1][1] =  conf_matrix[1][1] + 1
+            elif ID1 == 0:
+                conf_matrix[0][1] =  conf_matrix[0][1] + 1
+            elif ID2 == 0:
+                conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+        overallRelations = len(prop_matrix) * len(prop_matrix)
+
+        total_agreed_none = overallRelations - conf_matrix[0][0] - conf_matrix[0][1] - conf_matrix[1][0]
+
+        conf_matrix[1][1] = total_agreed_none
+
+        return conf_matrix
+
+    @staticmethod
+    def count_s_nodes(node_id, graph):
+        RA_count = 0
+        MA_count = 0
+        CA_count = 0
+        s_nodes = list(graph.predecessors(node_id))
+        for s in s_nodes:
+            n_type = graph.nodes[s]['type']
+            if n_type == 'RA':
+                RA_count = RA_count + 1
+            elif n_type == 'CA':
+                CA_count = CA_count + 1
+            elif n_type == 'MA':
+                MA_count = MA_count + 1
+        return RA_count, CA_count, MA_count
+
+    @staticmethod
+    def loc_ya_rels_comp(loc_matrix, graph1, graph2):
+
+        aifsim = Aifsim()
+
+        all_ya_text = aifsim.get_ya_node_text(graph1, graph2)
+        conf_matrix = [[0 for x in range(len(all_ya_text) + 1)] for y in range(len(all_ya_text) + 1)]
+        all_ya_text.append('')
+        #print(all_ya_text, conf_matrix)
+        #Get's all YAs anchored in Locutions
+
+        for rel_dict in loc_matrix:
+            ID1 = rel_dict['ID1']
+            ID2 = rel_dict['ID2']
+            text1 = rel_dict['text1']
+            text2 = rel_dict['text2']
+
+            if ID1 != 0 and ID2 != 0:
+
+                yas1 = aifsim.get_ya_nodes_from_id(ID1, graph1)
+                yas2 = aifsim.get_ya_nodes_from_id(ID2, graph2)
+
+
+
+
+                if yas1 == yas2:
+                    index = all_ya_text.index(yas1)
+
+                    conf_matrix[index][index] = conf_matrix[index][index] + 1
+
+
+                else:
+                    index1 = all_ya_text.index(yas1)
+                    index2 = all_ya_text.index(yas2)
+
+                    conf_matrix[index2][index1] = conf_matrix[index2][index1] + 1
+
+            elif ID1 == 0 and ID2 == 0:
+                conf_matrix[len(all_ya_text) - 1][len(all_ya_text) - 1] =  conf_matrix[len(all_ya_text) - 1][len(all_ya_text) - 1] + 1
+
+
+            elif ID1 == 0:
+                yas2 = aifsim.get_ya_nodes_from_id(ID2, graph2)
+                index = all_ya_text.index(yas2)
+
+                conf_matrix[len(all_ya_text) - 1][index] =  conf_matrix[len(all_ya_text) - 1][index] + 1
+            elif ID2 == 0:
+                yas1 = aifsim.get_ya_nodes_from_id(ID1, graph1)
+                index = all_ya_text.index(yas1)
+
+                conf_matrix[index][len(all_ya_text) - 1] =  conf_matrix[index][len(all_ya_text) - 1] + 1
+
+
+
+            #Get's all YAs anchored in Transitions via locutions - we only want to loop the matrix once
+
+            conf_matrix = get_ta_locs(ID1, ID2, graph1, graph2, conf_matrix, all_ya_text)
+
+
+
+
+
+
+
+        return conf_matrix
+
+
+    @staticmethod
+    def get_ta_locs(ID1, ID2, graph1, graph2, conf_matrix, all_ya_text):
+        all_ya_text_ext = copy.deepcopy(all_ya_text)
+        aifsim = Aifsim()
+        if ID1 != 0 and ID2 != 0:
+
+            tas1 = aifsim.get_ta_node_from_id(ID1, graph1)
+            tas2 = aifsim.get_ta_node_from_id(ID2, graph2)
+
+
+            if len(tas1) > 0 and len(tas2) > 0:
+                #compare the ta lists
+                if len(tas1) > len(tas2):
+                    for tai, ta in enumerate(tas1):
+                        tas2_id = ''
+                        yas1 = aifsim.get_ya_nodes_from_id(ta, graph1)
+                        try:
+                            tas2_id = tas2[tai]
+                        except:
+                            tas2_id = ''
+
+                        if tas2_id == '':
+                            index = all_ya_text_ext.index(yas1)
+
+
+                            conf_matrix[index][len(all_ya_text_ext) -1 ] =  conf_matrix[index][len(all_ya_text_ext) -1] + 1
+
+                        else:
+                            yas2 = aifsim.get_ya_nodes_from_id(tas2_id, graph2)
+                            if yas1 == yas2:
+                                index = all_ya_text_ext.index(yas1)
+
+                                conf_matrix[index][index] = conf_matrix[index][index] + 1
+
+                            else:
+
+                                index1 = all_ya_text_ext.index(yas1)
+                                index2 = all_ya_text_ext.index(yas2)
+
+                                conf_matrix[index2][index1] = conf_matrix[index2][index1] + 1
+                elif len(tas2) > len(tas1):
+                    for tai, ta in enumerate(tas2):
+                        tas1_id = ''
+                        yas2 = aifsim.get_ya_nodes_from_id(ta, graph2)
+                        try:
+                            tas1_id = tas1[tai]
+                        except:
+                            tas1_id = ''
+
+                        if tas1_id == '':
+                            index = all_ya_text_ext.index(yas2)
+
+                            conf_matrix[len(all_ya_text_ext)-1][index] =  conf_matrix[len(all_ya_text_ext)-1][index] + 1
+
+                        else:
+                            yas1 = aifsim.get_ya_nodes_from_id(tas1_id, graph1)
+                            if yas1 == yas2:
+                                index = all_ya_text_ext.index(yas2)
+
+                                conf_matrix[index][index] = conf_matrix[index][index] + 1
+
+
+                            else:
+                                index1 = all_ya_text_ext.index(yas1)
+                                index2 = all_ya_text_ext.index(yas2)
+
+                                conf_matrix[index2][index1] = conf_matrix[index2][index1] + 1
+                else:
+                    for tai, ta in enumerate(tas1):
+                        yas1 = aifsim.get_ya_nodes_from_id(ta, graph1)
+                        yas2 = aifsim.get_ya_nodes_from_id(tas2[tai], graph2)
+                        if yas1 == yas2:
+                            index = all_ya_text_ext.index(yas1)
+
+                            conf_matrix[index][index] = conf_matrix[index][index] + 1
+
+
+                        else:
+                            index1 = all_ya_text_ext.index(yas1)
+                            index2 = all_ya_text_ext.index(yas2)
+
+                            conf_matrix[index2][index1] = conf_matrix[index2][index1] + 1
+
+            elif len(tas1) > 0 and len(tas2) < 1:
+
+                for ta in tas1:
+                    yas1 = aifsim.get_ya_nodes_from_id(ta, graph1)
+                    if yas1 == '':
+                        conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] =  conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] + 1
+                    else:
+                        index = all_ya_text_ext.index(yas1)
+
+                        conf_matrix[index][len(all_ya_text_ext)-1] =  conf_matrix[index][len(all_ya_text_ext)-1] + 1
+
+            elif len(tas2) > 0 and len(tas1) < 1:
+
+                for ta in tas2:
+                    yas2 = aifsim.get_ya_nodes_from_id(ta, graph2)
+                    if yas2 == '':
+                        conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] =  conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] + 1
+                    else:
+                        index = all_ya_text_ext.index(yas2)
+
+                        conf_matrix[len(all_ya_text_ext)-1][index] =  conf_matrix[len(all_ya_text_ext)-1][index] + 1
+
+            elif len(tas1) < 1 and len(tas2) < 1:
+
+                conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] =  conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] + 1
+
+
+
+
+        elif ID1 == 0:
+            tas2 = aifsim.get_ta_node_from_id(ID2, graph2)
+
+            if len(tas2) > 0:
+                for ta in tas2:
+                    yas2 = aifsim.get_ya_nodes_from_id(ta, graph2)
+                    if yas2 == '':
+                        conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] =  conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] + 1
+                    else:
+                        index = all_ya_text.index(yas2)
+
+                        conf_matrix[len(all_ya_text_ext)-1][index] =  conf_matrix[len(all_ya_text_ext)-1][index] + 1
+            elif len(tas2) < 1:
+                conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] =  conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] + 1
+
+
+
+        elif ID2 == 0:
+            tas1 = aifsim.get_ta_node_from_id(ID1, graph1)
+
+            if len(tas1) > 0:
+                for ta in tas1:
+                    yas1 = aifsim.get_ya_nodes_from_id(ta, graph1)
+                    if yas1 == '':
+                        conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] =  conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] + 1
+                    else:
+                        index = all_ya_text_ext.index(yas1)
+
+                        conf_matrix[index][len(all_ya_text_ext)-1] =  conf_matrix[index][len(all_ya_text_ext)-1] + 1
+            elif len(tas1) < 1:
+                conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] =  conf_matrix[len(all_ya_text_ext)-1][len(all_ya_text_ext)-1] + 1
+
+
+        return conf_matrix
+
+    @staticmethod
+    def get_ya_node_text(graph1, graph2):
+        ya_node_list1 = []
+        ya_node_list2 = []
+        ya_text_list = []
+
+        centra = Centrality()
+        ya_node_list1 = centra.get_yas(graph1)
+        ya_node_list2 = centra.get_yas(graph2)
+
+        for ya in ya_node_list1:
+            n_text = graph1.nodes[ya]['text']
+            ya_text_list.append(n_text)
+        for ya in ya_node_list2:
+            n_text = graph2.nodes[ya]['text']
+            ya_text_list.append(n_text)
+
+        ya_text_list = list(set(ya_text_list))
+
+        return ya_text_list
+
+    @staticmethod
+    def get_ya_nodes_from_id(node_id, graph):
+
+        ya_nodes = list(graph.successors(node_id))
+        for ya in ya_nodes:
+            n_type = graph.nodes[ya]['type']
+            if n_type == 'YA':
+                n_text = graph.nodes[ya]['text']
+                return n_text
+        return ''
+
+    @staticmethod
+    def get_ta_node_from_id(node_id, graph):
+        ta_nodes = list(graph.successors(node_id))
+        ta_list = []
+        for ta in ta_nodes:
+            n_type = graph.nodes[ta]['type']
+            if n_type == 'TA':
+                n_id = ta
+
+                ta_list.append(n_id)
+        return ta_list
+
+    @staticmethod
+    def prop_ya_comp(prop_matrix, graph1, graph2):
+        aifsim = Aifsim()
+        all_ya_text = aifsim.get_ya_node_text(graph1, graph2)
+        conf_matrix = [[0 for x in range(len(all_ya_text) + 1)] for y in range(len(all_ya_text) + 1)]
+        all_ya_text.append('')
+        for rel_dict in prop_matrix:
+            ID1 = rel_dict['ID1']
+            ID2 = rel_dict['ID2']
+            text1 = rel_dict['text1']
+            text2 = rel_dict['text2']
+
+            if ID1 != 0 and ID2 != 0:
+
+                yas1 = aifsim.get_ya_nodes_from_prop(ID1, graph1)
+                yas2 = aifsim.get_ya_nodes_from_prop(ID2, graph2)
+
+                if yas1 == yas2:
+                    index = all_ya_text.index(yas1)
+
+                    conf_matrix[index][index] = conf_matrix[index][index] + 1
+
+
+                else:
+                    index1 = all_ya_text.index(yas1)
+                    index2 = all_ya_text.index(yas2)
+
+                    conf_matrix[index2][index1] = conf_matrix[index2][index1] + 1
+
+            elif ID1 == 0 and ID2 == 0:
+                conf_matrix[len(all_ya_text) - 1][len(all_ya_text) - 1] =  conf_matrix[len(all_ya_text) - 1][len(all_ya_text) - 1]
+            elif ID1 == 0:
+                yas2 = aifsim.get_ya_nodes_from_prop(ID2, graph2)
+                index = all_ya_text.index(yas2)
+
+                conf_matrix[len(all_ya_text) - 1][index] =  conf_matrix[len(all_ya_text) - 1][index] + 1
+            elif ID2 == 0:
+                yas2 = aifsim.get_ya_nodes_from_prop(ID1, graph1)
+                index = all_ya_text.index(yas1)
+
+                conf_matrix[index][len(all_ya_text) - 1] =  conf_matrix[index][len(all_ya_text) - 1] + 1
+
+        return conf_matrix
+
+    @staticmethod
+    def get_ya_node_text(graph1, graph2):
+        ya_node_list1 = []
+        ya_node_list2 = []
+        ya_text_list = []
+
+        centra = Centrality()
+        ya_node_list1 = centra.get_yas(graph1)
+        ya_node_list2 = centra.get_yas(graph2)
+
+        for ya in ya_node_list1:
+            n_text = graph1.nodes[ya]['text']
+            ya_text_list.append(n_text)
+        for ya in ya_node_list2:
+            n_text = graph2.nodes[ya]['text']
+            ya_text_list.append(n_text)
+
+        ya_text_list = list(set(ya_text_list))
+
+        return ya_text_list
+
+    @staticmethod
+    def get_ya_nodes_from_prop(node_id, graph):
+
+        ya_nodes = list(graph.predecessors(node_id))
+        for ya in ya_nodes:
+            n_type = graph.nodes[ya]['type']
+            if n_type == 'YA':
+                n_text = graph.nodes[ya]['text']
+                return n_text
+        return ''
+
+    @staticmethod
+    def loc_ta_rels_comp(loc_matrix, graph1, graph2):
+        aifsim = Aifsim()
+        conf_matrix = [[0, 0],[0, 0]]
+
+
+        for rel_dict in loc_matrix:
+            ID1 = rel_dict['ID1']
+            ID2 = rel_dict['ID2']
+            text1 = rel_dict['text1']
+            text2 = rel_dict['text2']
+
+            if ID1 != 0 and ID2 != 0:
+
+                tas1 = aifsim.count_ta_nodes(ID1, graph1)
+                tas2 = aifsim.count_ta_nodes(ID2, graph2)
+
+
+                if tas1 == tas2:
+                    conf_matrix[0][0] =  conf_matrix[0][0] + 1
+                elif tas1 > tas2:
+                    conf_matrix[1][0] =  conf_matrix[1][0] + 1
+                elif tas2 > tas1:
+                    conf_matrix[0][1] =  conf_matrix[0][1] + 1
+
+            elif ID1 == 0:
+                conf_matrix[0][1] =  conf_matrix[0][1] + 1
+            elif ID2 == 0:
+                conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+        overallRelations = len(loc_matrix) * len(loc_matrix)
+
+        total_agreed_none = overallRelations - conf_matrix[0][0] - conf_matrix[0][1] - conf_matrix[1][0]
+
+        conf_matrix[1][1] = total_agreed_none
+
+        return conf_matrix
+
+    @staticmethod
+    def count_ta_nodes(node_id, graph):
+        TA_count = 0
+        ta_nodes = list(graph.successors(node_id))
+        for ta in ta_nodes:
+            n_type = graph.nodes[ta]['type']
+            if n_type == 'TA':
+                TA_count = TA_count + 1
+        return TA_count
+
+    @staticmethod
+    def prop_ya_anchor_comp(prop_matrix, graph1, graph2):
+        aifsim = Aifsim()
+        conf_matrix = [[0, 0],[0, 0]]
+
+        for rel_dict in prop_matrix:
+            ID1 = rel_dict['ID1']
+            ID2 = rel_dict['ID2']
+            text1 = rel_dict['text1']
+            text2 = rel_dict['text2']
+
+            if ID1 != 0 and ID2 != 0:
+
+                yas1 = aifsim.get_ya_nodes_from_prop_id(ID1, graph1)
+                yas2 = aifsim.get_ya_nodes_from_prop_id(ID2, graph2)
+
+
+                n_anch_1 = aifsim.get_node_anchor(yas1, graph1)
+                n_anch_2 = aifsim.get_node_anchor(yas2, graph2)
+
+
+                if n_anch_1 == n_anch_2:
+
+                    conf_matrix[0][0] =  conf_matrix[0][0] + 1
+
+
+                else:
+                    conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+            elif ID1 == 0 and ID2 == 0:
+                conf_matrix[1][1] =  conf_matrix[1][1] + 1
+            elif ID1 == 0:
+                conf_matrix[0][1] =  conf_matrix[0][1] + 1
+            elif ID2 == 0:
+                conf_matrix[1][0] =  conf_matrix[1][0] + 1
+
+        return conf_matrix
+
+    @staticmethod
+    def get_ya_nodes_from_prop_id(node_id, graph):
+
+        ya_nodes = list(graph.predecessors(node_id))
+        for ya in ya_nodes:
+            n_type = graph.nodes[ya]['type']
+            if n_type == 'YA':
+                n_text = graph.nodes[ya]['text']
+                return ya
+        return ''
+
+    @staticmethod
+    def get_node_anchor(node_id, graph):
+        nodes = list(graph.predecessors(node_id))
+        for n in nodes:
+            n_type = graph.nodes[n]['type']
+            if n_type == 'L' or n_type == 'TA':
+                n_text = graph.nodes[n]['text']
+                return n_text
+        return ''
 
