@@ -111,7 +111,7 @@ class Aifsim:
         not_s_nodes = [x for x,y in g.nodes(data=True) if y['type']!='RA' and y['type']!='CA' and y['type']!='MA' and y['type']!='PA']
         return s_nodes, not_s_nodes
 
-    #Add comment
+    #Function to get I nodes and S nodes
     @staticmethod
     def get_i_s_nodes(g):
         i_s_nodes = [x for x,y in g.nodes(data=True) if y['type']=='I' or y['type']=='RA' or y['type']=='CA' or y['type']=='MA' or y['type']=='PA']
