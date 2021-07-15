@@ -9,6 +9,7 @@ import re
 import segeval
 from bs4 import BeautifulSoup, SoupStrainer
 import bs4
+import requests
 
 
 class Aifsim:
@@ -19,6 +20,17 @@ class Aifsim:
         return graph, json
 
     @staticmethod
+    def get_graphs(aif_id1, aif_id2):
+        centra = Centrality()
+        aifsim = Aifsim()
+        graph, json = aifsim.get_graph(aif_id1, centra)
+        graph1, json1 = aifsim.get_graph(aif_id2, centra)
+        graph = centra.remove_iso_analyst_nodes(graph)
+        graph1 = centra.remove_iso_analyst_nodes(graph1)
+
+        return graph, json, graph1, json1
+
+    @staticmethod
     def get_text(nodeset_id):
         text_path = 'http://ova.arg.tech/helpers/dbtxt.php?nodeSetID=' + str(nodeset_id)
         xml_page = requests.get(text_path)
@@ -27,6 +39,7 @@ class Aifsim:
 
     @staticmethod
     def get_similarity(text_1, text_2):
+        aifsim = Aifsim()
     #text_1 and text_2 are xml data that uses spans to seperate boundaries
     #e.g. BOSTON, MA ... <span class="highlighted" id="634541">Steven L.
     #Davis pled guilty yesterday to federal charges that he stole and disclosed trade secrets of The Gillette Company</span>.
@@ -37,13 +50,15 @@ class Aifsim:
 
             xml_soup_1 = BeautifulSoup(text_1)
             xml_soup_2 = BeautifulSoup(text_2)
-            xml_soup_1 = remove_html_tags(xml_soup_1)
-            xml_soup_2 = remove_html_tags(xml_soup_2)
+            xml_soup_1 = aifsim.remove_html_tags(xml_soup_1)
+            xml_soup_2 = aifsim.remove_html_tags(xml_soup_2)
 
-            segements_1 = get_segements(xml_soup_1)
-            segements_2 = get_segements(xml_soup_2)
 
-            seg_check = check_segment_length(segements_1, segements_2)
+            segements_1 = aifsim.get_segements(xml_soup_1)
+            segements_2 = aifsim.get_segements(xml_soup_2)
+
+
+            seg_check = aifsim.check_segment_length(segements_1, segements_2)
 
             if not seg_check:
                 return 'Error Source Text Was Different'
@@ -72,6 +87,56 @@ class Aifsim:
             return 'iat'
         else:
             return 'diff'
+
+    @staticmethod
+    def remove_html_tags(xml_soup):
+        for match in xml_soup.findAll('div'):
+            match.replaceWithChildren()
+        for match in xml_soup.findAll('p'):
+            match.replaceWithChildren()
+        for match in xml_soup.findAll('br'):
+            match.replaceWithChildren()
+
+        return xml_soup
+
+    @staticmethod
+    def get_segements(xml_soup):
+        segment_list = []
+        if xml_soup.body:
+            for i, tag in enumerate(xml_soup.body):
+                boundary_counter = i + 1
+                tag_text = ''
+                if 'span' in str(tag):
+                    tag_text = tag.text
+                else:
+                    tag_text = str(tag)
+
+                words = tag_text.split()
+                seg_len = len(words)
+                segment_list += seg_len * [boundary_counter]
+        else:
+            for i, tag in enumerate(xml_soup):
+                boundary_counter = i + 1
+                tag_text = ''
+                if 'span' in str(tag):
+                    tag_text = tag.text
+                else:
+                    tag_text = str(tag)
+
+                words = tag_text.split()
+                seg_len = len(words)
+                segment_list += seg_len * [boundary_counter]
+        return segment_list
+
+    @staticmethod
+    def check_segment_length(seg_1, seg_2):
+        seg_1_len = len(seg_1)
+        seg_2_len = len(seg_2)
+
+        if seg_1_len == seg_2_len:
+            return True
+        else:
+            return False
 
     @staticmethod
     def get_normalized_edit_distance(g1, g2, label_equal, attr_name):
@@ -403,7 +468,6 @@ class Aifsim:
     def rels_to_dict(rels, switched):
         new_list = []
         for rel in rels:
-
             id_1 = rel[0][0]
             id_2 = rel[1][0]
             text_1 = rel[0][1]
@@ -430,7 +494,6 @@ class Aifsim:
         g_inodes = centra.get_i_node_list(g_copy)
         g1_inodes = centra.get_i_node_list(g1_copy)
         relsi, valsi, switched = aifsim.text_sim_matrix(g_inodes, g1_inodes)
-
         #if switched the relations have been switched order so they need reversed when creating the dictionary
 
         rels_dict = aifsim.rels_to_dict(relsi, switched)
@@ -511,7 +574,7 @@ class Aifsim:
             index_list.remove(index_tup[0])
             counter = counter + 1
         for vals in index_list:
-            lev_rels.append((g_list[vals],''))
+            lev_rels.append((g_list[vals],(0,'')))
             lev_vals.append(0)
         return lev_rels, lev_vals
 
@@ -605,7 +668,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[1][0] =  conf_matrix[1][0] + 1
                         else:
-                            yas2 = get_ya_nodes(ras2_id, graph2)
+                            yas2 = aifsim.get_ya_nodes(ras2_id, graph2)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -841,6 +904,7 @@ class Aifsim:
             text1 = rel_dict['text1']
             text2 = rel_dict['text2']
 
+
             if ID1 != 0 and ID2 != 0:
 
                 ras1, cas1, mas1 = aifsim.count_s_nodes(ID1, graph1)
@@ -954,7 +1018,7 @@ class Aifsim:
 
             #Get's all YAs anchored in Transitions via locutions - we only want to loop the matrix once
 
-            conf_matrix = get_ta_locs(ID1, ID2, graph1, graph2, conf_matrix, all_ya_text)
+            conf_matrix = aifsim.get_ta_locs(ID1, ID2, graph1, graph2, conf_matrix, all_ya_text)
 
 
 
@@ -963,6 +1027,13 @@ class Aifsim:
 
 
         return conf_matrix
+
+    @staticmethod
+    def check_none(val):
+        if val == 'None':
+            return True
+        else:
+            return False
 
 
     @staticmethod
