@@ -34,13 +34,30 @@ def render_text():
     fid = session.get('fid', None)
     lid = session.get('lid', None)
     aifs = Aifsim()
-    text1 = aifs.get_text(fid)
-    text2 = aifs.get_text(lid)
+    #text1 = aifs.get_text(fid)
+    #text2 = aifs.get_text(lid)
 
-    ss, pk, win_diff = aifs.get_similarity(text1, text2)
+    #print(text1)
+    #print(text2)
+    print('Getting Graphs')
+    #ss, pk, win_diff = aifs.get_similarity(text1, text2)
+    ss = 0
+    pk = 0
+    wind_diff = 0
     g, g_json, g1, g1_json = aifs.get_graphs(fid,lid)
+
+    print('GOT GRAPHS')
+    print(' ')
+    print('Getting Prop Matrix')
     prop_rels = aifs.get_prop_sim_matrix(g, g1)
+
+    print(' ')
+    print('Getting LOC Matrix')
     loc_rels = aifs.get_loc_sim_matrix(g, g1)
+
+
+    print(' ')
+    print('Getting Prop Relations')
 
     ra_a = aifs.ra_anchor(g, g1)
     ma_a = aifs.ma_anchor(g, g1)
@@ -48,8 +65,13 @@ def render_text():
     all_a = aifs.combine_s_node_matrix(ra_a, ca_a, ma_a)
     all_s_a_dict = aifs.convert_to_dict(all_a)
 
+
+
     prop_rels_comp_conf = aifs.prop_rels_comp(prop_rels, g, g1)
     prop_rels_comp_dict = aifs.convert_to_dict(prop_rels_comp_conf)
+
+    print(' ')
+    print('Getting Loc Relations')
 
     loc_ya_rels_comp_conf = aifs.loc_ya_rels_comp(loc_rels, g, g1)
     loc_ya_rels_comp_dict = aifs.convert_to_dict(loc_ya_rels_comp_conf)
@@ -63,7 +85,8 @@ def render_text():
     prop_ya_conf = aifs.prop_ya_anchor_comp(prop_rels, g, g1)
     prop_ya_dict = aifs.convert_to_dict(prop_ya_conf)
 
-
+    print(' ')
+    print('Creating Conf Matrix')
 
     all_s_a_cm = ConfusionMatrix(matrix=all_s_a_dict)
     prop_rels_comp_cm = ConfusionMatrix(matrix=prop_rels_comp_dict)
@@ -72,8 +95,9 @@ def render_text():
     loc_ta_cm = ConfusionMatrix(matrix=loc_ta_dict)
     prop_ya_cm = ConfusionMatrix(matrix=prop_ya_dict)
 
-
-
+    print(' ')
+    print('Getting Kappa Values')
+    print(all_s_a_cm)
     s_node_kapp = all_s_a_cm.Kappa
     prop_rel_kapp = prop_rels_comp_cm.Kappa
     loc_rel_kapp = loc_ya_rels_comp_cm.Kappa
@@ -93,6 +117,9 @@ def render_text():
         loc_ta_kapp = loc_ta_cm.KappaNoPrevalence
     if aifs.check_none(prop_ya_an_kapp):
         prop_ya_an_kapp = prop_ya_cm.KappaNoPrevalence
+
+    print(' ')
+    print('Getting Scores')
 
     score_list = [s_node_kapp,prop_rel_kapp,loc_rel_kapp,prop_ya_kapp,loc_ta_kapp,prop_ya_an_kapp]
 

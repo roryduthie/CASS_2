@@ -15,7 +15,7 @@ import requests
 class Aifsim:
     @staticmethod
     def get_graph(aif_id, cent):
-        dir_path = 'http://www.aifdb.org/json/' + str(aif_id)
+        dir_path = 'http://www.aifdbqt.arg.tech/json/' + str(aif_id)
         graph, json = cent.get_graph_url(dir_path)
         return graph, json
 
@@ -32,7 +32,7 @@ class Aifsim:
 
     @staticmethod
     def get_text(nodeset_id):
-        text_path = 'http://ova.arg.tech/helpers/dbtxt.php?nodeSetID=' + str(nodeset_id)
+        text_path = 'http://ovaqt.arg.tech/helpers/dbtxt.php?nodeSetID=' + str(nodeset_id)
         xml_page = requests.get(text_path)
         xml_data = xml_page.text
         return xml_data
@@ -1265,7 +1265,7 @@ class Aifsim:
                 conf_matrix[len(all_ya_text) - 1][index] =  conf_matrix[len(all_ya_text) - 1][index] + 1
             elif ID2 == 0:
                 yas2 = aifsim.get_ya_nodes_from_prop(ID1, graph1)
-                index = all_ya_text.index(yas1)
+                index = all_ya_text.index(yas2)
 
                 conf_matrix[index][len(all_ya_text) - 1] =  conf_matrix[index][len(all_ya_text) - 1] + 1
 
