@@ -34,17 +34,14 @@ def render_text():
     fid = session.get('fid', None)
     lid = session.get('lid', None)
     aifs = Aifsim()
-    #text1 = aifs.get_text(fid)
-    #text2 = aifs.get_text(lid)
+    text1 = aifs.get_text(fid)
+    text2 = aifs.get_text(lid)
 
-    #print(text1)
-    #print(text2)
+
     print('Getting Graphs')
-    #ss, pk, win_diff = aifs.get_similarity(text1, text2)
-    ss = 0
-    pk = 0
-    wind_diff = 0
+    ss, pk, win_diff = aifs.get_similarity(text1, text2)
     g, g_json, g1, g1_json = aifs.get_graphs(fid,lid)
+
 
     print('GOT GRAPHS')
     print(' ')

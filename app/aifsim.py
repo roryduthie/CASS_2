@@ -15,7 +15,7 @@ import requests
 class Aifsim:
     @staticmethod
     def get_graph(aif_id, cent):
-        dir_path = 'http://www.aifdbqt.arg.tech/json/' + str(aif_id)
+        dir_path = 'http://www.aifdb.org/json/' + str(aif_id)
         graph, json = cent.get_graph_url(dir_path)
         return graph, json
 
@@ -32,7 +32,7 @@ class Aifsim:
 
     @staticmethod
     def get_text(nodeset_id):
-        text_path = 'http://ovaqt.arg.tech/helpers/dbtxt.php?nodeSetID=' + str(nodeset_id)
+        text_path = 'http://ova.arg.tech/helpers/dbtxt.php?nodeSetID=' + str(nodeset_id)
         xml_page = requests.get(text_path)
         xml_data = xml_page.text
         return xml_data
@@ -48,8 +48,30 @@ class Aifsim:
             return 'Error Text Input Is Empty'
         else:
 
+
+
+            text_1 = text_1.replace("`", "")
+            text_1 = text_1.replace("’", "")
+            text_1 = text_1.replace("'", "")
+            text_2 = text_2.replace("`", "")
+            text_2 = text_2.replace("’", "")
+            text_2 = text_2.replace("'", "")
+            text_1 = text_1.strip()
+            text_2 = text_2.strip()
+            text_1 = text_1.replace("[", " [")
+            text_2 = text_2.replace("[", " [")
+            text_1 = text_1.replace("  ", " ")
+            text_2 = text_2.replace("  ", " ")
+            text_1 = text_1.replace(".", ". ")
+            text_2 = text_2.replace(".", ". ")
+            text_1 = text_1.replace("  ", " ")
+            text_2 = text_2.replace("  ", " ")
+
             xml_soup_1 = BeautifulSoup(text_1)
             xml_soup_2 = BeautifulSoup(text_2)
+
+
+
             xml_soup_1 = aifsim.remove_html_tags(xml_soup_1)
             xml_soup_2 = aifsim.remove_html_tags(xml_soup_2)
 
@@ -57,14 +79,18 @@ class Aifsim:
             segements_1 = aifsim.get_segements(xml_soup_1)
             segements_2 = aifsim.get_segements(xml_soup_2)
 
+            print(xml_soup_1)
+            print(xml_soup_2)
 
             seg_check = aifsim.check_segment_length(segements_1, segements_2)
-
+            print('seg_check', seg_check)
             if not seg_check:
-                return 'Error Source Text Was Different'
+                print('Error Source Text Was Different')
 
             masses_1 = segeval.convert_positions_to_masses(segements_1)
             masses_2 = segeval.convert_positions_to_masses(segements_2)
+
+
 
             ss = segeval.segmentation_similarity(masses_1, masses_2)
             ss = float(ss)
