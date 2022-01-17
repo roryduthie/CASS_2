@@ -562,18 +562,18 @@ class Aifsim:
 
 
         if g_size >= g1_size:
-            mat = aifsim.loop_nodes(g_list, g1_list)
+            mat = aifsim.loop_nodes(g_list, g1_list,'harsh')
             rels, vals = aifsim.select_max_vals(mat, g1_size, g_list, g1_list)
         else:
             switch_flag = True
-            mat = aifsim.loop_nodes(g1_list, g_list)
+            mat = aifsim.loop_nodes(g1_list, g_list,'harsh')
             rels, vals = aifsim.select_max_vals(mat, g_size, g1_list, g_list)
 
         return rels, vals, switch_flag
 
 
     @staticmethod
-    def loop_nodes(g_list, g1_list):
+    def loop_nodes(g_list, g1_list, kappa_type):
         matrix = np.zeros((len(g_list), len(g1_list)))
         for i, node in enumerate(g_list):
             text = node[1]
@@ -583,8 +583,23 @@ class Aifsim:
                 text1 = node1[1]
                 text1 = text1.lower()
                 #lev_val = normalized_levenshtein.distance(text, text1)
+
                 lev_val = (fuzz.ratio(text, text1))/100
-                matrix[i][i1] = lev_val
+
+                if kappa_type == 'harsh':
+                    if lev_val < 1:
+                        matrix[i][i1] = 0
+                    else:
+                        matrix[i][i1] = lev_val
+                elif kappa_type == 'lenient':
+                    if lev_val < 0.5:
+                        matrix[i][i1] = 0
+                    else:
+                        matrix[i][i1] = lev_val
+                elif kappa_type == 'cass':
+                    matrix[i][i1] = lev_val
+                else:
+                    matrix[i][i1] = lev_val
 
         return matrix
 
@@ -598,13 +613,16 @@ class Aifsim:
         lev_rels = []
         index_list = list(range(len(g_list)))
         m_copy = copy.deepcopy(matrix)
+
         while counter <= smallest_value - 1:
             index_tup = unravel_index(m_copy.argmax(), m_copy.shape)
+            print(index_tup)
             #matrix[index_tup[0]][index_tup[1]] = -9999999
-            m_copy[index_tup[0]] = 0   # zeroes out row i
-            m_copy[:,index_tup[1]] = 0 # zeroes out column i
+            m_copy[index_tup[0]] = -1   # zeroes out row i
+            m_copy[:,index_tup[1]] = -1 # zeroes out column i
             lev_rels.append((g_list[index_tup[0]],g1_list[index_tup[1]]))
             lev_vals.append(matrix[index_tup[0]][index_tup[1]])
+            print(index_list)
             index_list.remove(index_tup[0])
             counter = counter + 1
         for vals in index_list:
