@@ -616,13 +616,13 @@ class Aifsim:
 
         while counter <= smallest_value - 1:
             index_tup = unravel_index(m_copy.argmax(), m_copy.shape)
-            print(index_tup)
+
             #matrix[index_tup[0]][index_tup[1]] = -9999999
             m_copy[index_tup[0]] = -1   # zeroes out row i
             m_copy[:,index_tup[1]] = -1 # zeroes out column i
             lev_rels.append((g_list[index_tup[0]],g1_list[index_tup[1]]))
             lev_vals.append(matrix[index_tup[0]][index_tup[1]])
-            print(index_list)
+
             index_list.remove(index_tup[0])
             counter = counter + 1
         for vals in index_list:
