@@ -60,17 +60,27 @@ class Aifsim:
             text_2 = text_2.strip()
             text_1 = text_1.replace("[", " [")
             text_2 = text_2.replace("[", " [")
+            text_1 = text_1.replace("]", "] ")
+            text_2 = text_2.replace("]", "] ")
             text_1 = text_1.replace("  ", " ")
             text_2 = text_2.replace("  ", " ")
-            text_1 = text_1.replace(".", ". ")
-            text_2 = text_2.replace(".", ". ")
+            text_1 = text_1.replace("...", " ")
+            text_2 = text_2.replace("...", " ")
+            text_1 = text_1.replace("…", " ")
+            text_2 = text_2.replace("…", " ")
+            text_1 = text_1.replace(".", " ")
+            text_2 = text_2.replace(".", " ")
+            text_1 = text_1.replace(",", " ")
+            text_2 = text_2.replace(",", " ")
+            text_1 = text_1.replace("!", " ")
+            text_2 = text_2.replace("!", " ")
+            text_1 = text_1.replace("?", " ")
+            text_2 = text_2.replace("?", " ")
             text_1 = text_1.replace("  ", " ")
             text_2 = text_2.replace("  ", " ")
 
             xml_soup_1 = BeautifulSoup(text_1)
             xml_soup_2 = BeautifulSoup(text_2)
-
-
 
             xml_soup_1 = aifsim.remove_html_tags(xml_soup_1)
             xml_soup_2 = aifsim.remove_html_tags(xml_soup_2)
@@ -79,11 +89,9 @@ class Aifsim:
             segements_1 = aifsim.get_segements(xml_soup_1)
             segements_2 = aifsim.get_segements(xml_soup_2)
 
-            print(xml_soup_1)
-            print(xml_soup_2)
+
 
             seg_check = aifsim.check_segment_length(segements_1, segements_2)
-            print('seg_check', seg_check)
             if not seg_check:
                 print('Error Source Text Was Different')
 
@@ -694,7 +702,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[1][0] =  conf_matrix[1][0] + 1
                         else:
-                            yas2 = aifsim.get_ya_nodes(ras2_id, graph2)
+                            yas2 = aifsim.get_ya_nodes_from_prop(ras2_id, graph2)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -714,7 +722,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[0][1] =  conf_matrix[0][1] + 1
                         else:
-                            yas1 = aifsim.get_ya_nodes(ras1_id, graph1)
+                            yas1 = aifsim.get_ya_nodes_from_prop(ras1_id, graph1)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -753,6 +761,8 @@ class Aifsim:
         ca1_len = len(cas1)
         ca2_len = len(cas2)
 
+
+
         if ca1_len > 0 and ca2_len > 0:
             if ca1_len > ca2_len:
                 for ca_i, ca in enumerate(cas1):
@@ -767,7 +777,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[1][0] =  conf_matrix[1][0] + 1
                         else:
-                            yas2 = aifsim.get_ya_nodes(cas2_id, graph2)
+                            yas2 = aifsim.get_ya_nodes_from_prop(cas2_id, graph2)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -783,11 +793,14 @@ class Aifsim:
                         except:
                             cas1_id = ''
 
+
+
                         if cas1_id == '':
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[0][1] =  conf_matrix[0][1] + 1
                         else:
-                            yas1 = aifsim.get_ya_nodes(cas1_id, graph1)
+                            yas1 = aifsim.get_ya_nodes_from_prop(cas1_id, graph1)
+
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -840,7 +853,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[1][0] =  conf_matrix[1][0] + 1
                         else:
-                            yas2 = aifsim.get_ya_nodes(cas2_id, graph2)
+                            yas2 = aifsim.get_ya_nodes_from_prop(cas2_id, graph2)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -860,7 +873,7 @@ class Aifsim:
                             #conf_matrix[index][len(all_ya_text) + 1] =  conf_matrix[index][len(all_ya_text) + 1] + 1
                             conf_matrix[0][1] =  conf_matrix[0][1] + 1
                         else:
-                            yas1 = aifsim.get_ya_nodes(cas1_id, graph1)
+                            yas1 = aifsim.get_ya_nodes_from_prop(cas1_id, graph1)
                             if yas1 == yas2:
 
                                 conf_matrix[0][0] =  conf_matrix[0][0] + 1
@@ -900,6 +913,7 @@ class Aifsim:
     def get_ya_nodes(node_id, graph):
 
         ya_nodes = list(graph.successors(node_id))
+
         for ya in ya_nodes:
             n_type = graph.nodes[ya]['type']
             if n_type == 'YA':
@@ -1265,16 +1279,19 @@ class Aifsim:
             text1 = rel_dict['text1']
             text2 = rel_dict['text2']
 
+
+
             if ID1 != 0 and ID2 != 0:
 
                 yas1 = aifsim.get_ya_nodes_from_prop(ID1, graph1)
                 yas2 = aifsim.get_ya_nodes_from_prop(ID2, graph2)
 
+
+
                 if yas1 == yas2:
                     index = all_ya_text.index(yas1)
 
                     conf_matrix[index][index] = conf_matrix[index][index] + 1
-
 
                 else:
                     index1 = all_ya_text.index(yas1)
@@ -1388,6 +1405,7 @@ class Aifsim:
             text1 = rel_dict['text1']
             text2 = rel_dict['text2']
 
+
             if ID1 != 0 and ID2 != 0:
 
                 yas1 = aifsim.get_ya_nodes_from_prop_id(ID1, graph1)
@@ -1396,6 +1414,7 @@ class Aifsim:
 
                 n_anch_1 = aifsim.get_node_anchor(yas1, graph1)
                 n_anch_2 = aifsim.get_node_anchor(yas2, graph2)
+
 
 
                 if n_anch_1 == n_anch_2:
@@ -1433,6 +1452,6 @@ class Aifsim:
             n_type = graph.nodes[n]['type']
             if n_type == 'L' or n_type == 'TA':
                 n_text = graph.nodes[n]['text']
-                return n_text
+                return n_type
         return ''
 
