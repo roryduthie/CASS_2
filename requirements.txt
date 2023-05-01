@@ -4,5 +4,5 @@ cython==0.29.21
 requests==2.23.0
 numpy==1.16.5
 fuzzywuzzy==0.18.0
-Flask==1.1.1
+Flask==2.3.2
 application==1.0
